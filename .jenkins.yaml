@@ -1,0 +1,15 @@
+git:
+  branch: "main"
+builders:
+  - script
+triggers:
+  cron: "@weekly"
+clean_workspace: true
+publish_over_ssh:
+  - pypi.sunet.se
+
+script:
+  - "virtualenv -p python3.7 venv"
+  - ". venv/bin/activate"
+  - "pip install --upgrade setuptools pip wheel"
+  - "python setup.py sdist bdist_wheel --universal"

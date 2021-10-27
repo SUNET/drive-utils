@@ -222,9 +222,12 @@ def run_remote_command(fqdn: str,
     """
     base_command = ['ssh', '-o', 'StrictHostKeyChecking=off', '-l', user, fqdn]
     run_command = base_command + command
-    with subprocess.Popen(run_command, stdout=output) as proc:
+    with subprocess.Popen(run_command, stdout=output, stderr=output) as proc:
         outs, errs = proc.communicate()
-    reply = outs.decode().strip('\n')
+    try:
+        reply = outs.decode().strip('\n')
+    except AttributeError:
+        reply = str()
 
     return (reply, errs)
 

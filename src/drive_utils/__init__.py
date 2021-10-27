@@ -7,6 +7,11 @@ import socket
 import subprocess
 import sys
 
+import requests
+import urllib3
+
+urllib3.disable_warnings()
+
 server_types = [
     "backup", "drive-idp-proxy", "fe-sto3-lb", "fe-sto4-lb", "gss",
     "gssbackup", "gss-db", "intern-db", "lb", "lookup", "lookupbackup",
@@ -205,3 +210,71 @@ def run_remote_command(fqdn, command: list) -> tuple:
     reply = outs.decode().strip('\n')
 
     return (reply, errs)
+
+
+def smoketest_db_cluster(fqdn: str) -> dict:
+    """smoketest_db_cluster.
+
+    :param fqdn:
+    :type fqdn: str
+    :rtype: dict
+    """
+    get_db_password = r"""grep MYSQL_ROOT_PASSWORD """
+    get_db_password += r"""/opt/docker-nextcloud_mariadb/docker-compose.yml"""
+    get_db_password += r""" | awk -F '=' '{print $2}'"""
+    result = run_remote_command(fqdn, [get_db_password])
+
+    if not result[1]:
+        data: dict = dict()
+        db_password = result[0]
+        mariadb_base = r'''docker exec dockernextcloudmariadb_app_1 mysql '''
+        mariadb_base += r'''-u root -p'{}' -N -B -e "show status like '{}'"'''
+        sizetest = [mariadb_base.format(db_password, 'wsrep_cluster_size')]
+        statustest = [mariadb_base.format(db_password, 'wsrep_cluster_status')]
+        size_result = run_remote_command(fqdn, sizetest)
+        status_result = run_remote_command(fqdn, statustest)
+
+        try:
+            data['size'] = size_result[0].split('\t')[1]
+        except:
+            return {'error': size_result[1]}
+
+        try:
+            data['status'] = status_result[0].split('\t')[1]
+        except:
+            return {'error': status_result[1]}
+
+        return data
+    else:
+        return {'error': result[1]}
+
+
+def smoketest_nextcloud_node(fqdn: str, port: str = "443") -> bool:
+    """smoketest_nextcloud_node.
+
+    :param fqdn:
+    :type fqdn: str
+    :param port:
+    :type port: str
+    :rtype: bool
+    """
+    status_url = "https://{}:{}/status.php".format(fqdn, port)
+    req = requests.get(status_url, verify=False)
+
+    if req.status_code != 200:
+        return False
+    data = req.json()
+
+    if 'installed' not in data.keys():
+        return False
+
+    if 'maintenance' not in data.keys():
+        return False
+
+    if not data['installed']:
+        return False
+
+    if data['maintenance']:
+        return False
+
+    return True

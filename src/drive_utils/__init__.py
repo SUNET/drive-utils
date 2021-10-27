@@ -232,6 +232,34 @@ def run_remote_command(fqdn: str,
     return (reply, errs)
 
 
+def smoketest_backup_node(fqdn: str) -> bool:
+    """smoketest_backup_node.
+
+    :param fqdn:
+    :type fqdn: str
+    :rtype: bool
+    """
+    get_db_password = r"""grep MYSQL_ROOT_PASSWORD """
+    get_db_password += r"""/opt/mariadb_backup/docker-compose.yml"""
+    get_db_password += r""" | awk -F '=' '{print $2}'"""
+    result = run_remote_command(fqdn, [get_db_password])
+    status = "OFF"
+
+    if not result[1]:
+        db_password = result[0]
+        mariadb_base = r'''docker exec mariadbbackup_mariadb_backup_1 mysql '''
+        mariadb_base += r'''-u root -p'{}' -N -B -e '''.format(db_password)
+        mariadb_base += r'''"show status like 'Slave_running'"'''
+        status_result = run_remote_command(fqdn, [mariadb_base])
+
+        try:
+            status = status_result[0].split('\t')[1]
+        except:
+            return False
+
+    return status == "ON"
+
+
 def smoketest_db_cluster(fqdn: str) -> dict:
     """smoketest_db_cluster.
 

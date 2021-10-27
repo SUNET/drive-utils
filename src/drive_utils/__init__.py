@@ -19,8 +19,11 @@ server_types = [
 ]
 
 
-def build_fqdn(instance: str, environment: str, number: int) -> str:
-    """build_fqdn for database server.
+def build_fqdn(instance: str,
+               environment: str,
+               number: int,
+               server_type: str = "") -> str:
+    """build_fqdn.
 
     :param instance:
     :type instance: str
@@ -28,18 +31,25 @@ def build_fqdn(instance: str, environment: str, number: int) -> str:
     :type environment: str
     :param number:
     :type number: int
+    :param server_type:
+    :type server_type: str
     :rtype: str
     """
-    basename = instance + '-db' + str(number)
+
     environ = '.' + environment + '.'
 
     if environment == 'prod':
         environ = '.'
     domain = '.drive' + environ + 'sunet.se'
 
+    basename = instance + '-db' + str(number)
+
     if instance not in ["gss", "lookup"]:
         domain = '.' + instance + domain
         basename = "intern-db" + str(number)
+
+    if server_type:
+        basename = server_type + str(number)
 
     return basename + domain
 

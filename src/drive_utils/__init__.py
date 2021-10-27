@@ -272,7 +272,10 @@ def smoketest_nextcloud_node(fqdn: str, port: str = "443") -> bool:
     :rtype: bool
     """
     status_url = "https://{}:{}/status.php".format(fqdn, port)
-    req = requests.get(status_url, verify=False)
+    try:
+        req = requests.get(status_url, verify=False)
+    except ConnectionError:
+        return False
 
     if req.status_code != 200:
         return False

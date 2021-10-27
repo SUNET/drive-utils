@@ -281,7 +281,7 @@ def smoketest_nextcloud_node(fqdn: str, port: str = "443") -> bool:
     status_url = "https://{}:{}/status.php".format(fqdn, port)
     try:
         req = requests.get(status_url, verify=False)
-    except ConnectionError:
+    except requests.exceptions.ConnectionError:
         return False
 
     if req.status_code != 200:

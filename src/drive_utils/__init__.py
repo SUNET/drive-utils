@@ -268,14 +268,14 @@ def smoketest_db_cluster(fqdn: str) -> dict:
     :rtype: dict
     """
     get_db_password = r"""grep MYSQL_ROOT_PASSWORD """
-    get_db_password += r"""/opt/docker-nextcloud_mariadb/docker-compose.yml"""
+    get_db_password += r"""/opt/mariadb/docker-compose.yml"""
     get_db_password += r""" | awk -F '=' '{print $2}'"""
     result = run_remote_command(fqdn, [get_db_password])
 
     if not result[1]:
         data: dict = dict()
         db_password = result[0]
-        mariadb_base = r'''docker exec dockernextcloudmariadb_app_1 mysql '''
+        mariadb_base = r'''docker exec mariadb_db_1 mysql '''
         mariadb_base += r'''-u root -p'{}' -N -B -e "show status like '{}'"'''
         sizetest = [mariadb_base.format(db_password, 'wsrep_cluster_size')]
         statustest = [mariadb_base.format(db_password, 'wsrep_cluster_status')]

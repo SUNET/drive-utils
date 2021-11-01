@@ -200,6 +200,9 @@ def parse_fqdn(fqdn: str) -> dict:
     elif server_type == 'lookupbackup':
         data['customer'] = 'lookup'
         data['common_dir'] = 'lookup-common'
+    elif server_type == 'drive':
+        data['customer'] = 'common'
+        data['common_dir'] = 'common-common'
     else:
         data['customer'] = 'common'
         data['common_dir'] = data['server_type'] + '-common'

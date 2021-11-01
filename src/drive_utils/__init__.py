@@ -129,7 +129,7 @@ def get_server_regex(data: dict) -> str:
     if server_regex == r'^monitor[1-9]\.drive\.sunet\.se$':
         server_regex = r'^monitor\.drive\.sunet\.se$'
     elif server_regex == r'^drive-idp-proxy[1-9]\.drive\.sunet\.se$':
-        server_regex = r'^drive-idp-proxy-[1-2]\.drive\.sunet\.se$'
+        server_regex = r'^drive-idp-proxy-[1-2]\.sunet\.se$'
 
     return server_regex
 

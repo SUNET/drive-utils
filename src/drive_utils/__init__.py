@@ -110,7 +110,7 @@ def get_server_regex(data: dict) -> str:
     :rtype: str
     """
 
-    if data['customer'] not in ["gss", "lookup", "common", "drive"]:
+    if data['customer'] not in ["gss", "lookup", "common"]:
         customer = r'\.' + data['customer']
     else:
         customer = ''
@@ -190,6 +190,8 @@ def parse_fqdn(fqdn: str) -> dict:
 
     if server_type in ["backup", "intern-db", "node", "script"]:
         data['customer'] = fqdn.split('.')[1]
+        if data['customer'] == 'drive':
+            data['customer'] = 'common'
         data['common_dir'] = data['customer'] + '-common'
     elif server_type in ['gss', 'lookup']:
         data['customer'] = server_type

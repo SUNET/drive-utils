@@ -110,7 +110,7 @@ def get_server_regex(data: dict) -> str:
     :rtype: str
     """
 
-    if data['customer'] not in ["gss", "lookup", "common"]:
+    if data['customer'] not in ["gss", "lookup", "common", "drive"]:
         customer = r'\.' + data['customer']
     else:
         customer = ''

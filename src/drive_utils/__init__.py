@@ -315,33 +315,13 @@ def smoketest_db_node(fqdn: str) -> bool:
     :type fqdn: str
     :rtype: bool
     """
-    get_db_password = r"""grep MYSQL_ROOT_PASSWORD """
-    get_db_password += r"""/opt/mariadb/docker-compose.yml"""
-    get_db_password += r""" | awk -F '=' '{print $2}'"""
-    result = run_remote_command(fqdn, [get_db_password])
 
-    if not result[1]:
-        data: dict = dict()
-        db_password = result[0]
-        mariadb_base = r'''docker exec mariadb_db_1 mysql '''
-        mariadb_base += r'''-u root -p'{}' -N -B -e "show status like '{}'"'''
-        sizetest = [mariadb_base.format(db_password, 'wsrep_cluster_size')]
-        statustest = [mariadb_base.format(db_password, 'wsrep_cluster_status')]
-        size_result = run_remote_command(fqdn, sizetest)
-        status_result = run_remote_command(fqdn, statustest)
+    data: dict = smoketest_db_cluster(fqdn)
 
-        try:
-            data['size'] = size_result[0].split('\t')[1]
-        except:
-            return False
+    if "error" in data:
+        return False
 
-        try:
-            data['status'] = status_result[0].split('\t')[1]
-        except:
-            return False
-
-        return data['size'] == "3" and data['status'] == "Primary"
-    return False
+    return data['size'] == "3" and data['status'] == "Primary"
 
 
 def smoketest_nextcloud_node(fqdn: str, port: str = "443") -> bool:

@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="drive-utils",
-    version="0.1.8",
+    version="0.1.9",
     author="Micke Nordin",
     author_email="kano@sunet.se",
     description="A small utility package for SUNET Drive",

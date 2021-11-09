@@ -340,7 +340,7 @@ def smoketest_db_node(fqdn: str) -> bool:
         except:
             return False
 
-        return data['size'] == "3" and data['status'] == "primary"
+        return data['size'] == "3" and data['status'] == "Primary"
     return False
 
 

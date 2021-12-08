@@ -203,7 +203,7 @@ def parse_fqdn(fqdn: str) -> dict:
         data['common_dir'] = 'gss-common'
     elif server_type in ['document', 'document-be', 'documentbackup']:
         data['customer'] = 'common'
-        data['common_dir'] = 'document-common'
+        data['common_dir'] = 'common-common'
     elif server_type == 'lookupbackup':
         data['customer'] = 'lookup'
         data['common_dir'] = 'lookup-common'

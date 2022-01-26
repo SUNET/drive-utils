@@ -201,13 +201,13 @@ def parse_fqdn(fqdn: str) -> dict:
     elif server_type == 'gssbackup':
         data['customer'] = 'gss'
         data['common_dir'] = 'gss-common'
-    elif server_type in ['document', 'document-be', 'documentbackup']:
-        data['customer'] = 'common'
-        data['common_dir'] = 'common-common'
     elif server_type == 'lookupbackup':
         data['customer'] = 'lookup'
         data['common_dir'] = 'lookup-common'
-    elif server_type == 'drive-idp-proxy':
+    elif server_type == 'kube':
+        data['customer'] = 'common'
+        data['common_dir'] = 'multinode-common'
+    elif server_type in ['drive-idp-proxy', 'document']:
         data['customer'] = 'common'
         data['common_dir'] = 'common-common'
     else:

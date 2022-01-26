@@ -15,8 +15,8 @@ urllib3.disable_warnings()
 server_types = [
     "backup", "document", "document-be", "documentbackup", "drive-idp-proxy",
     "fe-sto3-lb", "fe-sto4-lb", "gss", "gssbackup", "gss-db", "intern-db",
-    "lb", "lookup", "lookupbackup", "lookup-db", "monitor", "multinode",
-    "node", "script"
+    "lb", "lookup", "lookupbackup", "lookup-db", "kube", "monitor",
+    "multinode", "node", "script"
 ]
 
 

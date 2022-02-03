@@ -16,7 +16,7 @@ server_types = [
     "backup", "document", "document-be", "documentbackup", "drive-idp-proxy",
     "fe-sto3-lb", "fe-sto4-lb", "gss", "gssbackup", "gss-db", "intern-db",
     "lb", "lookup", "lookupbackup", "lookup-db", "kube", "monitor",
-    "multinode", "node", "script"
+    "multinode", "multinode-db", "node", "script"
 ]
 
 
@@ -204,7 +204,7 @@ def parse_fqdn(fqdn: str) -> dict:
     elif server_type == 'lookupbackup':
         data['customer'] = 'lookup'
         data['common_dir'] = 'lookup-common'
-    elif server_type == 'kube':
+    elif server_type in ['multinode-db','kube']:
         data['customer'] = 'common'
         data['common_dir'] = 'multinode-common'
     elif server_type in ['drive-idp-proxy', 'document']:

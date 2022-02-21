@@ -45,7 +45,7 @@ def build_fqdn(instance: str,
 
     basename = instance + '-db' + str(number)
 
-    if instance not in ["gss", "lookup"]:
+    if instance not in ["gss", "lookup", "multinode"]:
         domain = '.' + instance + domain
         basename = "intern-db" + str(number)
 

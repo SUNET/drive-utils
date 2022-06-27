@@ -223,7 +223,8 @@ def parse_fqdn(fqdn: str) -> dict:
 def run_remote_command(fqdn: str,
                        command: list,
                        user: str = "root",
-                       output=subprocess.PIPE) -> tuple:
+                       output=subprocess.PIPE,
+                       tty=False) -> tuple:
     """run_remote_command.
 
     :param fqdn:
@@ -235,7 +236,10 @@ def run_remote_command(fqdn: str,
     :param output:
     :rtype: tuple
     """
-    base_command = ['ssh', '-o', 'StrictHostKeyChecking=off', '-l', user, fqdn]
+    base_command = ['ssh', '-o', 'StrictHostKeyChecking=off']
+    if tty:
+        base_command.append("-t")
+    base_command = base_command + ['-l', user, fqdn]
     run_command = base_command + command
     with subprocess.Popen(run_command, stdout=output, stderr=output) as proc:
         outs, errs = proc.communicate()

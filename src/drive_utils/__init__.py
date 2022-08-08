@@ -55,7 +55,7 @@ def build_fqdn(instance: str,
     return basename + domain
 
 
-def compute_lb_node(fqdn: str) -> tuple[int, int]:
+def compute_lb_node(fqdn: str) -> tuple:
     """compute_lb_node.
 
     :param fqdn:
@@ -75,7 +75,7 @@ def compute_lb_node(fqdn: str) -> tuple[int, int]:
     return lbs
 
 
-def get_ips_for_hostname(hostname: str) -> tuple[list[str], list[str]]:
+def get_ips_for_hostname(hostname: str) -> tuple:
     """get_ips_for_hostname.
 
     :param hostname:
@@ -258,23 +258,12 @@ def smoketest_backup_node(fqdn: str) -> bool:
     :type fqdn: str
     :rtype: bool
     """
-    get_db_password = r"""grep MYSQL_ROOT_PASSWORD """
-    get_db_password += r"""/opt/mariadb_backup/docker-compose.yml"""
-    get_db_password += r""" | awk -F '=' '{print $2}'"""
-    result = run_remote_command(fqdn, [get_db_password])
-    status = "OFF"
+    status_result = run_remote_command(fqdn, ["sudo", "/usr/local/bin/status-test"])
 
-    if not result[1]:
-        db_password = result[0]
-        mariadb_base = r'''docker exec mariadbbackup_mariadb_backup_1 mysql '''
-        mariadb_base += r'''-u root -p'{}' -N -B -e '''.format(db_password)
-        mariadb_base += r'''"show status like 'Slave_running'"'''
-        status_result = run_remote_command(fqdn, [mariadb_base])
-
-        try:
-            status = status_result[0].split('\t')[1]
-        except:
-            return False
+    try:
+        status = status_result[0].split('\t')[1]
+    except:
+        return False
 
     return status == "ON"
 
@@ -286,35 +275,23 @@ def smoketest_db_cluster(fqdn: str) -> dict:
     :type fqdn: str
     :rtype: dict
     """
-    get_db_password = r"""grep MYSQL_ROOT_PASSWORD """
-    get_db_password += r"""/opt/mariadb/docker-compose.yml"""
-    get_db_password += r""" | awk -F '=' '{print $2}'"""
-    result = run_remote_command(fqdn, [get_db_password])
+    data: dict = dict()
+    sizetest = ["sudo", "/usr/local/bin/size-test"]
+    statustest = ["sudo", "/usr/local/bin/status-test"]
+    size_result = run_remote_command(fqdn, sizetest)
+    status_result = run_remote_command(fqdn, statustest)
 
-    if not result[1]:
-        data: dict = dict()
-        db_password = result[0]
-        mariadb_base = r'''docker exec mariadb_db_1 mysql '''
-        mariadb_base += r'''-u root -p'{}' -N -B -e "show status like '{}'"'''
-        sizetest = [mariadb_base.format(db_password, 'wsrep_cluster_size')]
-        statustest = [mariadb_base.format(db_password, 'wsrep_cluster_status')]
-        size_result = run_remote_command(fqdn, sizetest)
-        status_result = run_remote_command(fqdn, statustest)
+    try:
+        data['size'] = size_result[0].split('\t')[1]
+    except:
+        return {'error': size_result[1]}
 
-        try:
-            data['size'] = size_result[0].split('\t')[1]
-        except:
-            return {'error': size_result[1]}
+    try:
+        data['status'] = status_result[0].split('\t')[1]
+    except:
+        return {'error': status_result[1]}
 
-        try:
-            data['status'] = status_result[0].split('\t')[1]
-        except:
-            return {'error': status_result[1]}
-
-        return data
-    else:
-        return {'error': result[1]}
-
+    return data
 
 def smoketest_db_node(fqdn: str) -> bool:
     """smoketest_db_node.

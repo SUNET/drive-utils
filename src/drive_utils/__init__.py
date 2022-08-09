@@ -67,7 +67,7 @@ def compute_lb_node(fqdn: str) -> tuple:
     for char in fqdn:
         summation += ord(char)
     mhash = (summation % 2)
-    lbs: tuple[int, int] = (1, 2)
+    lbs: tuple = (1, 2)
 
     if mhash == 1:
         lbs = (3, 4)
@@ -251,14 +251,14 @@ def run_remote_command(fqdn: str,
     return (reply, errs)
 
 
-def smoketest_backup_node(fqdn: str) -> bool:
+def smoketest_backup_node(fqdn: str, user: str = "root") -> bool:
     """smoketest_backup_node.
 
     :param fqdn:
     :type fqdn: str
     :rtype: bool
     """
-    status_result = run_remote_command(fqdn, ["sudo", "/usr/local/bin/status-test"])
+    status_result = run_remote_command(fqdn, ["sudo", "/usr/local/bin/status-test"], user=user)
 
     try:
         status = status_result[0].split('\t')[1]
@@ -268,7 +268,7 @@ def smoketest_backup_node(fqdn: str) -> bool:
     return status == "ON"
 
 
-def smoketest_db_cluster(fqdn: str) -> dict:
+def smoketest_db_cluster(fqdn: str, user: str = "root") -> dict:
     """smoketest_db_cluster.
 
     :param fqdn:
@@ -278,8 +278,8 @@ def smoketest_db_cluster(fqdn: str) -> dict:
     data: dict = dict()
     sizetest = ["sudo", "/usr/local/bin/size-test"]
     statustest = ["sudo", "/usr/local/bin/status-test"]
-    size_result = run_remote_command(fqdn, sizetest)
-    status_result = run_remote_command(fqdn, statustest)
+    size_result = run_remote_command(fqdn, sizetest, user=user)
+    status_result = run_remote_command(fqdn, statustest, user=user)
 
     try:
         data['size'] = size_result[0].split('\t')[1]
@@ -293,7 +293,7 @@ def smoketest_db_cluster(fqdn: str) -> dict:
 
     return data
 
-def smoketest_db_node(fqdn: str) -> bool:
+def smoketest_db_node(fqdn: str, user: str = "root") -> bool:
     """smoketest_db_node.
 
     :param fqdn:
@@ -301,7 +301,7 @@ def smoketest_db_node(fqdn: str) -> bool:
     :rtype: bool
     """
 
-    data: dict = smoketest_db_cluster(fqdn)
+    data: dict = smoketest_db_cluster(fqdn, user=user)
 
     if "error" in data:
         return False

@@ -127,9 +127,9 @@ def get_server_regex(data: dict) -> str:
         prefix = r'^' + data['fqdn'].split('.')[0]
     server_regex = prefix + customer + r'\.drive' + suffix
 
-    if server_regex == r'^monitor[1-9]\.drive\.sunet\.se$':
-        server_regex = r'^monitor\.drive\.sunet\.se$'
-    elif server_regex == r'^drive-idp-proxy[1-9]\.drive\.sunet\.se$':
+    if server_regex.startswith(r'^monitor'):
+        server_regex = r'^monitor' + suffix
+    elif server_regex.startswith(r'^drive-idp-proxy'):
         server_regex = r'^drive-idp-proxy-[1-2]\.sunet\.se$'
 
     return server_regex

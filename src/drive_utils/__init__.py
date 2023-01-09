@@ -190,7 +190,7 @@ def parse_fqdn(fqdn: str) -> dict:
     if data['environment'] not in ['pilot', 'test']:
         data['environment'] = 'prod'
 
-    if server_type in ["backup", "intern-db", "node", "script"]:
+    if server_type in ["backup", "intern-db", "node", "redis", "script"]:
         data['customer'] = fqdn.split('.')[1]
 
         if data['customer'] == 'drive':

@@ -14,9 +14,10 @@ urllib3.disable_warnings()
 
 server_types = [
     "backup", "document", "document-be", "documentbackup", "drive-idp-proxy",
-    "fe-sto3-lb", "fe-sto4-lb", "gss", "gssbackup", "gss-db", "idp-proxy", "intern-db",
-    "lb", "lookup", "lookupbackup", "lookup-db", "kube", "monitor",
-    "multinode", "multinode-db", "ni", "node", "resolve", "script", "status"
+    "fe-sto3-lb", "fe-sto4-lb", "gss", "gssbackup", "gss-db", "idp-proxy",
+    "intern-db", "lb", "lookup", "lookupbackup", "lookup-db", "kube",
+    "monitor", "multinode", "multinode-db", "ni", "node", "redis", "resolve",
+    "script", "status"
 ]
 
 
@@ -204,7 +205,7 @@ def parse_fqdn(fqdn: str) -> dict:
     elif server_type == 'lookupbackup':
         data['customer'] = 'lookup'
         data['common_dir'] = 'lookup-common'
-    elif server_type in ['multinode-db','kube']:
+    elif server_type in ['multinode-db', 'kube']:
         data['customer'] = 'common'
         data['common_dir'] = 'multinode-common'
     elif server_type in ['drive-idp-proxy', 'document']:
@@ -258,7 +259,9 @@ def smoketest_backup_node(fqdn: str, user: str = "root") -> bool:
     :type fqdn: str
     :rtype: bool
     """
-    status_result = run_remote_command(fqdn, ["sudo", "/usr/local/bin/status-test"], user=user)
+    status_result = run_remote_command(fqdn,
+                                       ["sudo", "/usr/local/bin/status-test"],
+                                       user=user)
 
     try:
         status = status_result[0].split('\t')[1]
@@ -292,6 +295,7 @@ def smoketest_db_cluster(fqdn: str, user: str = "root") -> dict:
         return {'error': status_result[1]}
 
     return data
+
 
 def smoketest_db_node(fqdn: str, user: str = "root") -> bool:
     """smoketest_db_node.
